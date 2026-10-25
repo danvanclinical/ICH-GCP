@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ICH GCP Learning Dashboard</title>
+<style>
+:root{--bg:#f3f6f5;--surface:#fff;--ink:#14272b;--muted:#5a6e72;--line:#d5e0de;--accent:#0f6b6b;--accent-soft:#dcefee;--ok:#1d7a46;--okbg:#e0f3e8;--bad:#b3362b;--badbg:#f9e3e0;--warn:#8a5a00;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1819;--surface:#162426;--ink:#e6f0ef;--muted:#92a9ab;--line:#2a3f41;--accent:#5fc4c0;--accent-soft:#1b3535;--ok:#6fd49a;--okbg:#14301f;--bad:#ff8f84;--badbg:#3a1c19;--warn:#e8b44f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1819;--surface:#162426;--ink:#e6f0ef;--muted:#92a9ab;--line:#2a3f41;--accent:#5fc4c0;--accent-soft:#1b3535;--ok:#6fd49a;--okbg:#14301f;--bad:#ff8f84;--badbg:#3a1c19;--warn:#e8b44f;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Source Serif 4",Georgia,"Times New Roman",serif;max-width:100%;overflow-x:hidden}
+h1,h2,h3,button,.tab,.tag{font-family:"Inter Tight","Helvetica Neue",Arial,sans-serif}
+main{max-width:760px;margin:0 auto;padding:18px 16px 40px}
+header h1{font-size:1.65rem;line-height:1.15;margin:4px 0 6px;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted);max-width:60ch}
+.prog{margin:16px 0 4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
+.prog small{color:var(--muted);font-family:"Inter Tight",Arial,sans-serif}
+nav{display:flex;gap:6px;overflow-x:auto;padding:12px 0;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+.tab{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:20px;font-size:.92rem;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+section{display:none}section.on{display:block}
+h2{font-size:1.25rem;margin:8px 0 10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.card h3{margin:0 0 6px;font-size:1.02rem}
+.card p{margin:0}
+.muted{color:var(--muted)}
+.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.tag{display:inline-block;font-size:.78rem;background:var(--accent-soft);color:var(--accent);padding:2px 9px;border-radius:12px;margin-bottom:6px}
+button.btn{font-size:.95rem;border:1px solid var(--accent);background:var(--accent);color:var(--bg);padding:9px 16px;border-radius:8px;cursor:pointer}
+button.ghost{background:transparent;color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.flash{min-height:210px;display:flex;flex-direction:column;justify-content:center;text-align:center;cursor:pointer;padding:22px}
+.flash .big{font-size:1.15rem;font-family:"Inter Tight",Arial,sans-serif;font-weight:600}
+.key{color:var(--accent);font-weight:600;font-family:"Inter Tight",Arial,sans-serif}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:11px 13px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;font:inherit;cursor:pointer}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}.opt.bad{background:var(--badbg);border-color:var(--bad)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;padding:10px 14px}
+summary{cursor:pointer;font-family:"Inter Tight",Arial,sans-serif;font-weight:600}
+details ul{margin:8px 0 2px;padding-left:20px}
+.seg{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.note{border-left:4px solid var(--warn);padding:8px 12px;background:var(--surface);border-radius:0 8px 8px 0;margin:12px 0;font-size:.94rem}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+.scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>ICH GCP, made easy to learn</h1>
+<p>Good Clinical Practice is the international ethical and scientific quality standard for trials involving people. Work through the tabs, then test yourself.</p>
+</header>
+<div class="prog" aria-live="polite"><b style="font-family:'Inter Tight',Arial,sans-serif">Your progress</b> <small id="ptxt"></small><div class="bar"><i id="pbar"></i></div></div>
+<nav role="tablist" id="tabs"></nav>
+
+<section id="s-overview">
+<h2>The big picture</h2>
+<div class="card"><span class="tag">Purpose</span><p>GCP protects the <span class="key">rights, safety and well-being</span> of trial participants and makes sure trial data are <span class="key">credible</span>. If it wasn’t documented, it wasn’t done.</p></div>
+<div class="grid">
+<div class="card"><h3>Who’s involved</h3><p class="muted">Participant (subject), Investigator, Sponsor, IRB/IEC (ethics committee), Regulators, CRO and Monitor.</p></div>
+<div class="card"><h3>Three pillars</h3><p class="muted">Ethics (Helsinki) · Science (sound protocol) · Data integrity (accurate, verifiable records).</p></div>
+<div class="card"><h3>Core documents</h3><p class="muted">Protocol, Investigator’s Brochure (IB), Informed Consent Form (ICF), CRF, SOPs.</p></div>
+</div>
+<h2>Key terms</h2>
+<div id="terms"></div>
+<div class="note"><b>Which version?</b> ICH E6(R2) lists 13 principles and is the version most training uses. ICH E6(R3) was finalized in January 2025 and restructures GCP into 11 principles plus annexes, with more emphasis on proportionate, risk-based quality and fit-for-purpose data governance. Check which version your regulator and sponsor currently require.</div>
+<div class="row"><button class="btn" data-go="principles">Start with the principles</button></div>
+</section>
+
+<section id="s-principles">
+<h2>The 13 principles (E6 R2)</h2>
+<p class="muted">Tap the card to flip. Mark each one when you know it.</p>
+<div class="card flash" id="flash" tabindex="0" role="button" aria-label="Flip card"></div>
+<div class="row"><button class="btn ghost" id="prev">Previous</button><button class="btn ghost" id="next">Next</button><button class="btn" id="know">I know this</button></div>
+<p class="muted" id="fcount" style="margin-top:10px"></p>
+</section>
+
+<section id="s-roles">
+<h2>Roles and responsibilities</h2>
+<div class="seg" id="roleseg"></div>
+<div id="roleview"></div>
+</section>
+
+<section id="s-docs">
+<h2>Essential documents</h2>
+<p class="muted">Kept in the Investigator/Institution file and the Sponsor file (the TMF) so the trial can be reconstructed and audited.</p>
+<div id="docs"></div>
+</section>
+
+<section id="s-consent">
+<h2>Informed consent in 5 steps</h2>
+<div id="steps"></div>
+<div class="note"><b>Remember:</b> consent is a process, not just a signature. Re-consent whenever new information could affect willingness to continue.</div>
+<h2>Serious Adverse Event (SAE)</h2>
+<div class="card"><p>Any untoward medical occurrence that, at any dose: <span class="key">results in death</span>, is <span class="key">life-threatening</span>, needs <span class="key">hospitalization or prolongs it</span>, causes <span class="key">persistent or significant disability</span>, or is a <span class="key">congenital anomaly/birth defect</span>. Investigators report SAEs to the sponsor immediately.</p></div>
+</section>
+
+<section id="s-quiz">
+<h2>Test yourself</h2>
+<div id="quiz"></div>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const TABS=[["overview","Overview"],["principles","Principles"],["roles","Roles"],["docs","Documents"],["consent","Consent & SAEs"],["quiz","Quiz"]];
+const TERMS=[["AE","Adverse event: any untoward medical occurrence in a participant given a product, not necessarily caused by it."],["ADR","Adverse drug reaction: a noxious, unintended response where a causal link is at least a reasonable possibility."],["ICF","Informed Consent Form: documents a participant’s voluntary agreement after being informed."],["IB","Investigator’s Brochure: clinical and nonclinical data on the product."],["CRF","Case Report Form: collects protocol-required data per participant."],["SOP","Standard Operating Procedure: written steps for consistent performance."],["Monitoring","Sponsor oversight that checks rights, data accuracy and protocol compliance."],["Audit","Independent systematic review of trial activities and documents."]];
+const PR=[["Ethics","Trials follow the ethical principles of the Declaration of Helsinki and are consistent with GCP and applicable regulations."],["Risk vs benefit","Foreseeable risks are weighed against benefits. Start or continue only if benefits justify risks."],["Participants first","The rights, safety and well-being of participants outweigh the interests of science and society."],["Adequate information","Nonclinical and clinical information must support the proposed trial."],["Sound science","Trials are scientifically sound and described in a clear, detailed protocol."],["Protocol and approval","Conduct the trial per the protocol that received prior IRB/IEC approval."],["Medical care","A qualified physician (or dentist) is responsible for medical care and decisions."],["Qualified people","Everyone involved is qualified by education, training and experience."],["Informed consent","Freely given informed consent is obtained from every participant before participation."],["Records","All trial information is recorded, handled and stored so it can be accurately reported, interpreted and verified."],["Confidentiality","Records that could identify participants are protected, respecting privacy and confidentiality rules."],["Investigational product","Products are made, handled and stored per GMP and used per the approved protocol."],["Quality systems","Systems with procedures assure the quality of every aspect of the trial."]];
+const ROLES={Investigator:{tag:"Runs the trial at the site",pts:["Is qualified and has adequate resources and time","Follows the approved protocol; documents and explains any deviations","Obtains informed consent before any trial procedure","Delegates tasks only to trained staff, recorded on a delegation log","Records and reports AEs; reports SAEs to the sponsor immediately","Keeps accurate, legible, contemporaneous source data and CRFs","Accounts for the investigational product","Allows monitoring, audits and inspections"]},Sponsor:{tag:"Initiates, manages and finances",pts:["Implements and maintains quality assurance and quality control","Uses risk-based quality management","Chooses qualified investigators and (if used) a CRO, keeping overall responsibility","Provides the protocol, IB and safe, GMP-made product","Monitors the trial and handles safety reporting to regulators and investigators","Maintains the trial master file and archives records","Arranges compensation and insurance as required"]},"IRB / IEC":{tag:"Independent ethics review",pts:["Safeguards rights, safety and well-being of participants","Reviews protocol, ICF, IB, recruitment material and investigator suitability","Gives written approval or favourable opinion before the trial starts","Reviews ongoing trials at least once a year","Reviews amendments and safety reports","Keeps records, including minutes, for the required period"]}};
+const DOCS=[["Before the trial starts",["Investigator’s Brochure","Signed protocol and amendments","Informed consent form and participant information","IRB/IEC approval and composition","Regulatory authority approval where needed","Investigator CV and financial arrangements","Laboratory normal ranges and certification"]],["During the trial",["Updated IB and protocol amendments","IRB/IEC re-approvals","Signed consent forms","Delegation log and training records","Monitoring visit reports","Safety reports and SAE notifications","Source documents and CRFs"]],["After the trial",["Investigational product accountability and destruction records","Final close-out monitoring report","Participant identification code list","Audit certificate if performed","Final clinical study report"]]];
+const STEPS=[["Explain","Give oral and written information in plain language, covering purpose, procedures, risks, benefits and alternatives."],["Allow time","Give the person enough time and opportunity to ask questions and decide."],["Voluntary","Confirm no coercion or undue influence. They can withdraw at any time without penalty."],["Sign and date","Participant and the person conducting the discussion sign and date the current approved ICF before any trial procedure."],["Copy and update","Give the participant a copy. Re-consent when new information is relevant."]];
+const QZ=[["Whose interests take priority in a trial?",["Science and society","The sponsor","Participants’ rights, safety and well-being","The investigator"],2,"Principle 3: participants first."],["When must informed consent be obtained?",["After the first screening visit","Before any trial-specific procedure","Within a week of enrolment","Only for invasive procedures"],1,"Consent comes before any trial-specific procedure."],["Which body gives independent ethics approval?",["Sponsor","Monitor","IRB/IEC","CRO"],2,"The IRB/IEC reviews and approves the protocol and consent materials."],["Which is NOT a criterion for a serious adverse event?",["Requires hospitalization","Is life-threatening","Is a mild headache that resolves","Results in death"],2,"A mild, self-resolving event does not meet seriousness criteria."],["Who is responsible for reporting SAEs to the sponsor immediately?",["Investigator","IRB/IEC","Participant","Regulator"],0,"The investigator reports SAEs to the sponsor immediately."],["How should a protocol deviation be handled?",["Ignore if minor","Document and explain it","Delete the entry","Tell only the monitor verbally"],1,"Deviations are documented and explained, never hidden."],["The Investigator’s Brochure mainly contains…",["Participant names","Clinical and nonclinical data on the product","Site budget","Consent signatures"],1,"The IB summarizes product data relevant to the study."],["Data in trial records should be…",["Estimated later","Accurate, legible and contemporaneous","Held only by the sponsor","Edited without trace"],1,"Good documentation: attributable, legible, contemporaneous, original, accurate (ALCOA)."],["How often should the IRB/IEC review an ongoing trial, at minimum?",["Once a year","Every 5 years","Only at the start","Only at the end"],0,"At least once a year, appropriate to the degree of risk."],["Investigational products must be manufactured under…",["Local custom","GMP","Sponsor preference","No specific standard"],1,"Principle 12: GMP."]];
+const P=(()=>{let d={known:[],best:0};try{const s=localStorage.getItem("gcp");if(s)d=JSON.parse(s)}catch(e){}return d})();
+function save(){try{localStorage.setItem("gcp",JSON.stringify(P))}catch(e){}}
+function prog(){const t=Math.round((P.known.length/13)*70+(P.best/QZ.length)*30);$("#pbar").style.width=t+"%";$("#ptxt").textContent=P.known.length+"/13 principles known · best quiz "+P.best+"/"+QZ.length}
+function show(id){document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id==="s-"+id));document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.id===id));try{history.replaceState(null,"","#"+id)}catch(e){}window.scrollTo(0,0)}
+TABS.forEach(([id,l])=>{const b=document.createElement("button");b.className="tab";b.role="tab";b.dataset.id=id;b.textContent=l;b.onclick=()=>show(id);$("#tabs").appendChild(b)});
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
+$("#terms").innerHTML=TERMS.map(t=>`<details><summary>${t[0]}</summary><p>${t[1]}</p></details>`).join("");
+let fi=0,back=false;
+function flash(){const [t,d]=PR[fi];const f=$("#flash");f.innerHTML=back?`<p>${d}</p>`:`<span class="muted">Principle ${fi+1} of 13</span><div class="big">${t}</div><span class="muted">Tap to reveal</span>`;$("#fcount").textContent=P.known.includes(fi)?"Marked as known":"Not marked yet";$("#know").textContent=P.known.includes(fi)?"Unmark":"I know this"}
+$("#flash").onclick=()=>{back=!back;flash()};$("#flash").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();back=!back;flash()}};
+$("#prev").onclick=()=>{fi=(fi+12)%13;back=false;flash()};$("#next").onclick=()=>{fi=(fi+1)%13;back=false;flash()};
+$("#know").onclick=()=>{const i=P.known.indexOf(fi);i>=0?P.known.splice(i,1):P.known.push(fi);save();prog();flash()};
+function role(n){$("#roleseg").innerHTML=Object.keys(ROLES).map(k=>`<button class="tab" aria-selected="${k===n}" data-r="${k}">${k}</button>`).join("");$("#roleseg").querySelectorAll("button").forEach(b=>b.onclick=()=>role(b.dataset.r));const r=ROLES[n];$("#roleview").innerHTML=`<div class="card"><span class="tag">${r.tag}</span><ul>${r.pts.map(p=>`<li>${p}</li>`).join("")}</ul></div>`}
+role("Investigator");
+$("#docs").innerHTML=DOCS.map((d,i)=>`<details ${i?"":"open"}><summary>${d[0]}</summary><ul>${d[1].map(x=>`<li>${x}</li>`).join("")}</ul></details>`).join("");
+$("#steps").innerHTML=STEPS.map((s,i)=>`<div class="card"><h3>${i+1}. ${s[0]}</h3><p class="muted">${s[1]}</p></div>`).join("");
+let qi=0,score=0,done=false;
+function quiz(){const q=$("#quiz");if(qi>=QZ.length){if(score>P.best){P.best=score;save();prog()}q.innerHTML=`<div class="card"><h3>You scored ${score} out of ${QZ.length}</h3><p class="muted">${score>=8?"Strong grasp of the essentials.":score>=5?"Good start. Review the principles and roles, then retry.":"Revisit the Principles tab, then try again."}</p><div class="row"><button class="btn" id="re">Retry quiz</button></div></div>`;$("#re").onclick=()=>{qi=0;score=0;quiz()};return}
+const [t,o,a]=QZ[qi];done=false;q.innerHTML=`<p class="muted">Question ${qi+1} of ${QZ.length}</p><div class="card"><h3>${t}</h3>${o.map((x,i)=>`<button class="opt" data-i="${i}">${x}</button>`).join("")}<p id="fb" class="muted" aria-live="polite"></p><div class="row"><button class="btn" id="nx" style="display:none">${qi===QZ.length-1?"See score":"Next question"}</button></div></div>`;
+q.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(done)return;done=true;const i=+b.dataset.i;if(i===a)score++;q.querySelectorAll(".opt").forEach((x,j)=>{if(j===a)x.classList.add("ok");else if(j===i)x.classList.add("bad")});$("#fb").textContent=(i===a?"Correct. ":"Not quite. ")+QZ[qi][3];$("#nx").style.display="";$("#nx").onclick=()=>{qi++;quiz()}})}
+quiz();flash();prog();
+const h=(location.hash||"").slice(1);show(TABS.some(t=>t[0]===h)?h:"overview");
+</script>
+</body>
+</html>
